@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "malayalam_asr_benchmarking"
+  site-url: "https://kurianbenoy.github.io/malayalam_asr_benchmarking"
+  description: "A study to benchmark whisper based ASRs in Malayalam"
+  repo-branch: main
+  repo-url: "https://github.com/kurianbenoy/malayalam_asr_benchmarking"
