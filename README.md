@@ -42,8 +42,6 @@ quarto](https://quarto.org/docs/get-started/)
 
 ## How to use
 
-Fill me in please! Don’t forget code examples:
-
 ``` python
 from malayalam_asr_benchmarking.commonvoice import evaluate_whisper_model_common_voice
 ```
