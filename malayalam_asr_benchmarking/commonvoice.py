@@ -11,19 +11,21 @@ from datasets import load_dataset, Audio
 from jiwer import wer, cer
 from transformers import pipeline
 
-from .utils import whisper_norm, is_target_text_in_range, get_text, normalise, data, get_model_size, clear_gpu_memory
+from malayalam_asr_benchmarking.utils import (
+    whisper_norm,
+    is_target_text_in_range,
+    get_text,
+    normalise,
+    data,
+    get_model_size,
+    clear_gpu_memory,
+)
 
 # %% ../nbs/01_commonvoice.ipynb 4
-def evaluate_whisper_model_common_voice(model_name: "str")->None:
-    whisper_asr = pipeline(
-            "automatic-speech-recognition", model=model_name, device=0
-        )
+def evaluate_whisper_model_common_voice(model_name: "str") -> None:
+    whisper_asr = pipeline("automatic-speech-recognition", model=model_name, device=0)
 
-    dataset = load_dataset(
-            "mozilla-foundation/common_voice_11_0",
-            "ml",
-            split="test"
-    )
+    dataset = load_dataset("mozilla-foundation/common_voice_11_0", "ml", split="test")
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
     dataset = dataset.map(normalise)
     dataset = dataset.filter(is_target_text_in_range, input_columns=["norm_text"])
@@ -34,17 +36,20 @@ def evaluate_whisper_model_common_voice(model_name: "str")->None:
     for out in whisper_asr(data(dataset), batch_size=16):
         predictions.append(whisper_norm(out["text"]))
         references.append(out["reference"][0])
-        
-        
+
     end = time.time()
     print(f"Total time taken: {end - start}")
-    
+
     df = pd.DataFrame({"predictions": predictions, "ground_truth": references})
     df["model_name"] = model_name
-    df["wer"] = df.apply(lambda row: wer(row["ground_truth"], row["predictions"]), axis=1)
-    df["cer"] = df.apply(lambda row: cer(row["ground_truth"], row["predictions"]), axis=1)
-    df["total_time"] = end-start
-    
+    df["wer"] = df.apply(
+        lambda row: wer(row["ground_truth"], row["predictions"]), axis=1
+    )
+    df["cer"] = df.apply(
+        lambda row: cer(row["ground_truth"], row["predictions"]), axis=1
+    )
+    df["total_time"] = end - start
+
     rwer = wer(references, predictions)
     rwer = round(100 * rwer, 2)
     print(f"The WER of model: {rwer}")
@@ -52,9 +57,9 @@ def evaluate_whisper_model_common_voice(model_name: "str")->None:
     rcer = cer(references, predictions)
     rcer = round(100 * rcer, 2)
     print(f"The CER of model: {rcer}")
-    
+
     print(f"The model size is: {get_model_size(whisper_asr.model)}")
     df["model_size"] = get_model_size(whisper_asr.model)
     df.to_parquet(f"test_file.parquet")
-    
+
     clear_gpu_memory()

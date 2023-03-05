@@ -37,7 +37,8 @@ def get_text(sample):
             f"Expected transcript column of either 'text', 'sentence', 'normalized_text' or 'transcript'. Got sample of "
             ".join{sample.keys()}. Ensure a text column name is present in the dataset."
         )
-        
+
+
 def normalise(batch):
     batch["norm_text"] = whisper_norm(get_text(batch))
     return batch
