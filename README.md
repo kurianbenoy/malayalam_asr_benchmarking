@@ -42,13 +42,16 @@ quarto](https://quarto.org/docs/get-started/)
 
 ## How to use
 
-``` python
-from malayalam_asr_benchmarking.commonvoice import evaluate_whisper_model_common_voice
-```
+<details>
+<summary>Code</summary>
 
 ``` python
+from malayalam_asr_benchmarking.commonvoice import evaluate_whisper_model_common_voice
+
 evaluate_whisper_model_common_voice("parambharat/whisper-tiny-ml")
 ```
+
+</details>
 
     Found cached dataset common_voice_11_0 (/home/.cache/huggingface/datasets/mozilla-foundation___common_voice_11_0/ml/11.0.0/2c65b95d99ca879b1b1074ea197b65e0497848fd697fdb0582e0f6b75b6f4da0)
     Loading cached processed dataset at /home/.cache/huggingface/datasets/mozilla-foundation___common_voice_11_0/ml/11.0.0/2c65b95d99ca879b1b1074ea197b65e0497848fd697fdb0582e0f6b75b6f4da0/cache-374585c2877047e3.arrow
@@ -56,7 +59,7 @@ evaluate_whisper_model_common_voice("parambharat/whisper-tiny-ml")
     /opt/conda/lib/python3.8/site-packages/transformers/generation_utils.py:1359: UserWarning: Neither `max_length` nor `max_new_tokens` has been set, `max_length` will default to 448 (`self.config.max_length`). Controlling `max_length` via the config is deprecated and `max_length` will be removed from the config in v5 of Transformers -- we recommend using `max_new_tokens` to control the maximum length of the generation.
       warnings.warn(
 
-    Total time taken: 117.81971025466919
+    Total time taken: 133.23447608947754
     The WER of model: 38.31
     The CER of model: 21.93
     The model size is: 37.76M
