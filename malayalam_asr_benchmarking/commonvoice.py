@@ -76,6 +76,11 @@ def evaluate_whisper_model_common_voice(
     print(f"The model size is: {get_model_size(whisper_asr.model)}")
     modelsizelist.append(get_model_size(whisper_asr.model))
     df["model_size"] = get_model_size(whisper_asr.model)
-    df.to_parquet(f"test_file.parquet")
+
+    save_name = model_name.split("/")
+    print(save_name)
+    df.to_parquet(
+        f"/home/commonvoice_results/{save_name[0]}_{save_name[1]}_commonvoice.parquet"
+    )
 
     clear_gpu_memory()
