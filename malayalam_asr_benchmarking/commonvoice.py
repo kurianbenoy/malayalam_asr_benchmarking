@@ -5,6 +5,7 @@ __all__ = ['load_common_voice_malayalam_dataset', 'evaluate_whisper_model_common
 
 # %% ../nbs/01_commonvoice.ipynb 3
 import time
+from typing import List
 
 import pandas as pd
 from datasets import load_dataset, Audio
@@ -30,7 +31,13 @@ def load_common_voice_malayalam_dataset():
     return dataset
 
 # %% ../nbs/01_commonvoice.ipynb 5
-def evaluate_whisper_model_common_voice(model_name: "str") -> None:
+def evaluate_whisper_model_common_voice(
+    model_name: str,
+    werlist: List[float],
+    cerlist: List[float],
+    modelsizelist: List[str],
+    timelist: List[float],
+) -> None:
     whisper_asr = pipeline("automatic-speech-recognition", model=model_name, device=0)
     dataset = load_common_voice_malayalam_dataset()
 
@@ -44,6 +51,7 @@ def evaluate_whisper_model_common_voice(model_name: "str") -> None:
 
     end = time.time()
     print(f"Total time taken: {end - start}")
+    timelist.append(end - start)
 
     df = pd.DataFrame({"predictions": predictions, "ground_truth": references})
     df["model_name"] = model_name
@@ -57,13 +65,16 @@ def evaluate_whisper_model_common_voice(model_name: "str") -> None:
 
     rwer = wer(references, predictions)
     rwer = round(100 * rwer, 2)
+    werlist.append(rwer)
     print(f"The WER of model: {rwer}")
 
     rcer = cer(references, predictions)
     rcer = round(100 * rcer, 2)
+    cerlist.append(rcer)
     print(f"The CER of model: {rcer}")
 
     print(f"The model size is: {get_model_size(whisper_asr.model)}")
+    modelsizelist.append(get_model_size(whisper_asr.model))
     df["model_size"] = get_model_size(whisper_asr.model)
     df.to_parquet(f"test_file.parquet")
 
