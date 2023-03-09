@@ -16,5 +16,6 @@ website:
     search: true
   sidebar:
     style: floating
+  body-footer: Made by [Kurian Benoy](https://kurianbenoy.com/). See the [code.](https://github.com/kurianbenoy/malayalam_asr_benchmarking)
 
 metadata-files: [nbdev.yml, sidebar.yml]
