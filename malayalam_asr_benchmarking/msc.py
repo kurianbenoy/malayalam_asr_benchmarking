@@ -37,6 +37,7 @@ def evaluate_whisper_model_msc(
     cerlist: List[float],
     modelsizelist: List[str],
     timelist: List[float],
+    bs: int = 16,
 ) -> None:
     whisper_asr = pipeline("automatic-speech-recognition", model=model_name, device=0)
     dataset = load_malayalam_speech_corpus_dataset()
@@ -45,7 +46,7 @@ def evaluate_whisper_model_msc(
     references = []
 
     start = time.time()
-    for out in whisper_asr(data(dataset), batch_size=16):
+    for out in whisper_asr(data(dataset), batch_size=bs):
         predictions.append(whisper_norm(out["text"]))
         references.append(out["reference"][0])
 
