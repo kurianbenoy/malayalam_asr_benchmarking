@@ -32,12 +32,12 @@ def load_malayalam_speech_corpus_dataset():
 
 # %% ../nbs/02_msc.ipynb 6
 def evaluate_whisper_model_msc(
-    model_name: str,
-    werlist: List[float],
-    cerlist: List[float],
-    modelsizelist: List[str],
-    timelist: List[float],
-    bs: int = 16,
+    model_name: str,  # The model name
+    werlist: List[float],  # WER List
+    cerlist: List[float],  # CER list
+    modelsizelist: List[str],  # model size list
+    timelist: List[float],  # time(s) list
+    bs: int = 16,  # batch size
 ) -> None:
     whisper_asr = pipeline("automatic-speech-recognition", model=model_name, device=0)
     dataset = load_malayalam_speech_corpus_dataset()
@@ -66,11 +66,13 @@ def evaluate_whisper_model_msc(
 
     rwer = wer(references, predictions)
     rwer = round(100 * rwer, 2)
+    df["total_wer"] = rwer
     werlist.append(rwer)
     print(f"The WER of model: {rwer}")
 
     rcer = cer(references, predictions)
     rcer = round(100 * rcer, 2)
+    df["total_cer"] = rcer
     cerlist.append(rcer)
     print(f"The CER of model: {rcer}")
 
