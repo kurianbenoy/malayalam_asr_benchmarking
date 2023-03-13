@@ -11,6 +11,7 @@ import pandas as pd
 from datasets import load_dataset, Audio
 from jiwer import wer, cer
 from transformers import pipeline
+from tqdm.notebook import tqdm
 
 from malayalam_asr_benchmarking.utils import (
     whisper_norm,
@@ -46,10 +47,12 @@ def evaluate_whisper_model_msc(
     references = []
 
     start = time.time()
-    for out in whisper_asr(data(dataset), batch_size=bs):
+    print("process of calculating predictions")
+    for out in tqdm(whisper_asr(data(dataset), batch_size=bs)):
         predictions.append(whisper_norm(out["text"]))
         references.append(out["reference"][0])
 
+    print("completed getting predictions")
     end = time.time()
     print(f"Total time taken: {end - start}")
     timelist.append(end - start)
@@ -82,6 +85,8 @@ def evaluate_whisper_model_msc(
 
     save_name = model_name.split("/")
     print(save_name)
-    df.to_parquet(f"/home/msc_results/{save_name[0]}_{save_name[1]}_msc.parquet")
+    df.to_parquet(
+        f"/home/malayalam_msc_benchmarking/{save_name[0]}_{save_name[1]}_msc.parquet"
+    )
 
     clear_gpu_memory()
