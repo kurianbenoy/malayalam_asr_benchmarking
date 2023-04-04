@@ -36,12 +36,16 @@ normalizer = BasicTextNormalizer()
 
 
 def evaluate_whisper_model_common_voice(
-    model_name: str,
-    werlist: List[float],
-    cerlist: List[float],
-    modelsizelist: List[str],
-    timelist: List[float],
+    model_name: str,  # The model name
+    werlist: List[float],  # WER List
+    cerlist: List[float],  # CER list
+    modelsizelist: List[str],  # model size list
+    timelist: List[float],  # time(s) list
+    bs: int = 16,  # batch size. Default value is 16.
 ) -> None:
+    """A utility function for calculing WER in Common voice dataset provided a model name in huggingface.
+    You can store a WER, CER, ModelSize, TimeList to calculate results cumulatively over different epochs
+    """
     whisper_asr = pipeline("automatic-speech-recognition", model=model_name, device=0)
     dataset = load_common_voice_malayalam_dataset()
 
@@ -49,7 +53,7 @@ def evaluate_whisper_model_common_voice(
     references = []
 
     start = time.time()
-    for out in whisper_asr(data(dataset), batch_size=16):
+    for out in whisper_asr(data(dataset), batch_size=bs):
         predictions.append(normalizer((out["text"])))
         references.append(normalizer(out["reference"][0]))
 
