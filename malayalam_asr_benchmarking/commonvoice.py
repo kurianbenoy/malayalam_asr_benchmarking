@@ -93,8 +93,6 @@ def evaluate_whisper_model_common_voice(
 
     save_name = model_name.split("/")
     print(save_name)
-    df.to_parquet(
-        f"/home/commonvoice_results/{save_name[0]}_{save_name[1]}_commonvoice.parquet"
-    )
+    df.to_parquet(f"{save_name[0]}_{save_name[1]}_commonvoice.parquet")
 
     clear_gpu_memory()
