@@ -1,6 +1,7 @@
 _docs/
 _proc/
 
+
 *.bak
 .gitattributes
 .last_checked
@@ -149,3 +150,7 @@ checklink/cookies.txt
 
 # Quarto
 .quarto
+
+# Generated dataset files
+
+*.parquet
