@@ -94,6 +94,6 @@ def evaluate_whisper_model_msc(
 
     save_name = model_name.split("/")
     print(save_name)
-    df.to_parquet(f"/home/c/{save_name[0]}_{save_name[1]}_msc.parquet")
+    df.to_parquet(f"{save_name[0]}_{save_name[1]}_msc.parquet")
 
     clear_gpu_memory()
