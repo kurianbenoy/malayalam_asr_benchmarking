@@ -2,4 +2,7 @@ website:
   sidebar:
     contents:
       - index.ipynb
-      - 00_core.ipynb
+      - 00_utils.ipynb
+      - 01_commonvoice.ipynb
+      - 02_msc.ipynb
+      - 99_whisper_event.ipynb
