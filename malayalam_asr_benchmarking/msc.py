@@ -14,12 +14,11 @@ from faster_whisper import WhisperModel
 from jiwer import wer, cer
 from transformers import pipeline
 from tqdm.notebook import tqdm
-from whisper_normalizer.basic import BasicTextNormalizer
+from whisper_normalizer.basic import MalayalamTextNormalizer
 
 from malayalam_asr_benchmarking.utils import (
     is_target_text_in_range,
     get_text,
-    normalise,
     data,
     get_model_size,
     clear_gpu_memory,
@@ -29,12 +28,11 @@ from malayalam_asr_benchmarking.utils import (
 def load_malayalam_speech_corpus_dataset():
     dataset = load_dataset("thennal/msc", split="train")
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
-    dataset = dataset.map(normalise)
     dataset = dataset.filter(is_target_text_in_range, input_columns=["norm_text"])
     return dataset
 
 # %% ../nbs/02_msc.ipynb 6
-normalizer = BasicTextNormalizer()
+normalizer = MalayalamTextNormalizer()
 
 
 def evaluate_whisper_model_msc(

@@ -14,13 +14,11 @@ from faster_whisper import WhisperModel
 from jiwer import wer, cer
 from transformers import pipeline
 from tqdm.notebook import tqdm
-from whisper_normalizer.basic import BasicTextNormalizer
+from whisper_normalizer.malayalam import MalayalamTextNormalizer
 
 from malayalam_asr_benchmarking.utils import (
-    whisper_norm,
     is_target_text_in_range,
     get_text,
-    normalise,
     data,
     get_model_size,
     clear_gpu_memory,
@@ -30,12 +28,11 @@ from malayalam_asr_benchmarking.utils import (
 def load_common_voice_malayalam_dataset():
     dataset = load_dataset("mozilla-foundation/common_voice_11_0", "ml", split="test")
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
-    dataset = dataset.map(normalise)
     dataset = dataset.filter(is_target_text_in_range, input_columns=["norm_text"])
     return dataset
 
 # %% ../nbs/01_commonvoice.ipynb 6
-normalizer = BasicTextNormalizer()
+normalizer = MalayalamTextNormalizer()
 
 
 def evaluate_whisper_model_common_voice(
@@ -52,11 +49,15 @@ def evaluate_whisper_model_common_voice(
     whisper_asr = pipeline("automatic-speech-recognition", model=model_name, device=0)
     dataset = load_common_voice_malayalam_dataset()
 
+    prediction_raw = []
+    references_raw = []
     predictions = []
     references = []
 
     start = time.time()
     for out in whisper_asr(data(dataset), batch_size=bs):
+        prediction_raw.append(out["text"])
+        references_raw.append(out["reference"][0])
         predictions.append(normalizer((out["text"])))
         references.append(normalizer(out["reference"][0]))
 
@@ -123,6 +124,8 @@ def evaluate_faster_whisper_model_common_voice(
     start = time.time()
     for x in tqdm(dataset):
         segments, info = model.transcribe(x["audio"]["array"], beam_size=beam_size)
+        predictions_raw.append(" ".join([segment.text for segment in segments]))
+        references_raw.append(x["sentence"])
         predictions.append(normalizer(" ".join([segment.text for segment in segments])))
         references.append(normalizer(x["sentence"]))
 

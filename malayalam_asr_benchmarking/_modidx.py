@@ -26,6 +26,4 @@ d = { 'settings': { 'branch': 'main',
                                                   'malayalam_asr_benchmarking.utils.get_text': ( 'utils.html#get_text',
                                                                                                  'malayalam_asr_benchmarking/utils.py'),
                                                   'malayalam_asr_benchmarking.utils.is_target_text_in_range': ( 'utils.html#is_target_text_in_range',
-                                                                                                                'malayalam_asr_benchmarking/utils.py'),
-                                                  'malayalam_asr_benchmarking.utils.normalise': ( 'utils.html#normalise',
-                                                                                                  'malayalam_asr_benchmarking/utils.py')}}}
+                                                                                                                'malayalam_asr_benchmarking/utils.py')}}}
