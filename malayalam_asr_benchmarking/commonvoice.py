@@ -14,7 +14,7 @@ from faster_whisper import WhisperModel
 from jiwer import wer, cer
 from transformers import pipeline
 from tqdm.notebook import tqdm
-from whisper_normalizer.malayalam import MalayalamTextNormalizer
+from whisper_normalizer.indic_normalizer import MalayalamNormalizer
 
 from malayalam_asr_benchmarking.utils import (
     is_target_text_in_range,
@@ -22,6 +22,7 @@ from malayalam_asr_benchmarking.utils import (
     data,
     get_model_size,
     clear_gpu_memory,
+    store_results_as_dataset,
 )
 
 # %% ../nbs/01_commonvoice.ipynb 4
@@ -32,7 +33,7 @@ def load_common_voice_malayalam_dataset():
     return dataset
 
 # %% ../nbs/01_commonvoice.ipynb 6
-normalizer = MalayalamTextNormalizer()
+normalizer = MalayalamNormalizer()
 
 
 def evaluate_whisper_model_common_voice(
@@ -126,22 +127,6 @@ def evaluate_faster_whisper_model_common_voice(
     print(f"Total time taken: {end - start}")
     timelist.append(end - start)
 
-    df = pd.DataFrame({"predictions": predictions, "ground_truth": references})
-    df["model_name"] = model_name
-    df["wer"] = df.apply(
-        lambda row: wer(
-            normalizer(row["ground_truth"]), normalizer(row["predictions"])
-        ),
-        axis=1,
-    )
-    df["cer"] = df.apply(
-        lambda row: cer(
-            normalizer(row["ground_truth"]), normalizer(row["predictions"])
-        ),
-        axis=1,
-    )
-    df["total_time"] = end - start
-
     rwer = wer(references, predictions)
     rwer = round(100 * rwer, 2)
     werlist.append(rwer)
@@ -156,8 +141,16 @@ def evaluate_faster_whisper_model_common_voice(
     # modelsizelist.append(get_model_size(whisper_asr.model))
     # df["model_size"] = get_model_size(whisper_asr.model)
 
-    save_name = model_name.split("/")
-    print(save_name)
-    df.to_parquet(f"{save_name[0]}_{save_name[1]}_commonvoice.parquet")
-
+    store_results_as_dataset(
+        predictions,
+        predictions_raw,
+        references,
+        references_raw,
+        model_name,
+        end - start,
+        None,
+        rwer,
+        rcer,
+        "commonvoice.parquet",
+    )
     clear_gpu_memory()
