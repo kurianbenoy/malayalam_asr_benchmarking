@@ -14,7 +14,7 @@ from faster_whisper import WhisperModel
 from jiwer import wer, cer
 from transformers import pipeline
 from tqdm.notebook import tqdm
-from whisper_normalizer.malayalam import MalayalamTextNormalizer
+from whisper_normalizer.indic_normalizer import MalayalamNormalizer
 
 from malayalam_asr_benchmarking.utils import (
     is_target_text_in_range,
@@ -22,6 +22,7 @@ from malayalam_asr_benchmarking.utils import (
     data,
     get_model_size,
     clear_gpu_memory,
+    store_results_as_dataset,
 )
 
 # %% ../nbs/02_msc.ipynb 5
@@ -32,9 +33,9 @@ def load_malayalam_speech_corpus_dataset():
     return dataset
 
 # %% ../nbs/02_msc.ipynb 6
-normalizer = MalayalamTextNormalizer()
+normalizer = MalayalamNormalizer()
 
-
+# %% ../nbs/02_msc.ipynb 7
 def evaluate_whisper_model_msc(
     model_name: str,  # The model name
     werlist: List[float],  # WER List
@@ -48,10 +49,14 @@ def evaluate_whisper_model_msc(
 
     predictions = []
     references = []
+    predictions_raw = []
+    references_raw = []
 
     start = time.time()
     print("process of calculating predictions")
     for out in tqdm(whisper_asr(data(dataset), batch_size=bs)):
+        predictions_raw.append(out["text"])
+        references_raw.append(out["reference"][0])
         predictions.append(normalizer(out["text"]))
         references.append(normalizer(out["reference"][0]))
 
@@ -60,45 +65,37 @@ def evaluate_whisper_model_msc(
     print(f"Total time taken: {end - start}")
     timelist.append(end - start)
 
-    df = pd.DataFrame({"predictions": predictions, "ground_truth": references})
-    df["model_name"] = model_name
-    df["wer"] = df.apply(
-        lambda row: wer(
-            normalizer(row["ground_truth"]), normalizer(row["predictions"])
-        ),
-        axis=1,
-    )
-    df["cer"] = df.apply(
-        lambda row: cer(
-            normalizer(row["ground_truth"]), normalizer(row["predictions"])
-        ),
-        axis=1,
-    )
-    df["total_time"] = end - start
-
     rwer = wer(references, predictions)
     rwer = round(100 * rwer, 2)
-    df["total_wer"] = rwer
+    # df["total_wer"] = rwer
     werlist.append(rwer)
     print(f"The WER of model: {rwer}")
 
     rcer = cer(references, predictions)
     rcer = round(100 * rcer, 2)
-    df["total_cer"] = rcer
+    # df["total_cer"] = rcer
     cerlist.append(rcer)
     print(f"The CER of model: {rcer}")
 
     print(f"The model size is: {get_model_size(whisper_asr.model)}")
     modelsizelist.append(get_model_size(whisper_asr.model))
-    df["model_size"] = get_model_size(whisper_asr.model)
+    # df["model_size"] = get_model_size(whisper_asr.model)
 
-    save_name = model_name.split("/")
-    print(save_name)
-    df.to_parquet(f"{save_name[0]}_{save_name[1]}_msc.parquet")
-
+    store_results_as_dataset(
+        predictions,
+        predictions_raw,
+        references,
+        references_raw,
+        model_name,
+        end - start,
+        get_model_size(whisper_asr.model),
+        rwer,
+        rcer,
+        "msc.parquet",
+    )
     clear_gpu_memory()
 
-# %% ../nbs/02_msc.ipynb 17
+# %% ../nbs/02_msc.ipynb 16
 def evaluate_faster_whisper_model_msc(
     model_name: str,  # The model name
     werlist: List[float],  # WER List
@@ -117,32 +114,20 @@ def evaluate_faster_whisper_model_msc(
 
     predictions = []
     references = []
+    predictions_raw = []
+    references_raw = []
 
     start = time.time()
     for x in tqdm(dataset):
         segments, info = model.transcribe(x["audio"]["array"], beam_size=beam_size)
+        predictions_raw.append(" ".join([segment.text for segment in segments]))
         predictions.append(normalizer(" ".join([segment.text for segment in segments])))
+        references_raw.append(x["transcript"])
         references.append(normalizer(x["transcript"]))
 
     end = time.time()
     print(f"Total time taken: {end - start}")
     timelist.append(end - start)
-
-    df = pd.DataFrame({"predictions": predictions, "ground_truth": references})
-    df["model_name"] = model_name
-    df["wer"] = df.apply(
-        lambda row: wer(
-            normalizer(row["ground_truth"]), normalizer(row["predictions"])
-        ),
-        axis=1,
-    )
-    df["cer"] = df.apply(
-        lambda row: cer(
-            normalizer(row["ground_truth"]), normalizer(row["predictions"])
-        ),
-        axis=1,
-    )
-    df["total_time"] = end - start
 
     rwer = wer(references, predictions)
     rwer = round(100 * rwer, 2)
@@ -158,8 +143,20 @@ def evaluate_faster_whisper_model_msc(
     # modelsizelist.append(get_model_size(whisper_asr.model))
     # df["model_size"] = get_model_size(whisper_asr.model)
 
-    save_name = model_name.split("/")
-    print(save_name)
-    df.to_parquet(f"{save_name[0]}_{save_name[1]}_msc.parquet")
+    # save_name = model_name.split("/")
+    # print(save_name)
+    # df.to_parquet(f"{save_name[0]}_{save_name[1]}_msc.parquet")
+    store_results_as_dataset(
+        predictions,
+        predictions_raw,
+        references,
+        references_raw,
+        model_name,
+        end - start,
+        None,
+        rwer,
+        rcer,
+        "msc.parquet",
+    )
 
     clear_gpu_memory()
