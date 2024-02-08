@@ -8,6 +8,8 @@ import gc
 
 import pandas as pd
 import torch
+
+from jiwer import wer, cer
 from numerize import numerize
 
 # %% ../nbs/00_utils.ipynb 4
