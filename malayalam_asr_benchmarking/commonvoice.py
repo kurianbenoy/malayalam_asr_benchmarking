@@ -17,7 +17,6 @@ from tqdm.notebook import tqdm
 from whisper_normalizer.indic_normalizer import MalayalamNormalizer
 
 from malayalam_asr_benchmarking.utils import (
-    is_target_text_in_range,
     get_text,
     data,
     get_model_size,
@@ -25,17 +24,16 @@ from malayalam_asr_benchmarking.utils import (
     store_results_as_dataset,
 )
 
-# %% ../nbs/01_commonvoice.ipynb 4
+# %% ../nbs/01_commonvoice.ipynb 5
 def load_common_voice_malayalam_dataset():
     dataset = load_dataset("mozilla-foundation/common_voice_11_0", "ml", split="test")
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
-    dataset = dataset.filter(is_target_text_in_range, input_columns=["text"])
     return dataset
 
-# %% ../nbs/01_commonvoice.ipynb 6
+# %% ../nbs/01_commonvoice.ipynb 7
 normalizer = MalayalamNormalizer()
 
-
+# %% ../nbs/01_commonvoice.ipynb 8
 def evaluate_whisper_model_common_voice(
     model_name: str,  # The model name
     werlist: List[float],  # WER List
@@ -95,7 +93,7 @@ def evaluate_whisper_model_common_voice(
     clear_gpu_memory()
     del whisper_asr
 
-# %% ../nbs/01_commonvoice.ipynb 20
+# %% ../nbs/01_commonvoice.ipynb 19
 def evaluate_faster_whisper_model_common_voice(
     model_name: str,  # The model name
     werlist: List[float],  # WER List
@@ -114,6 +112,8 @@ def evaluate_faster_whisper_model_common_voice(
 
     predictions = []
     references = []
+    predictions_raw = []
+    references_raw = []
 
     start = time.time()
     for x in tqdm(dataset):

@@ -17,7 +17,6 @@ from tqdm.notebook import tqdm
 from whisper_normalizer.indic_normalizer import MalayalamNormalizer
 
 from malayalam_asr_benchmarking.utils import (
-    is_target_text_in_range,
     get_text,
     data,
     get_model_size,
@@ -29,13 +28,12 @@ from malayalam_asr_benchmarking.utils import (
 def load_malayalam_speech_corpus_dataset():
     dataset = load_dataset("thennal/msc", split="train")
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
-    dataset = dataset.filter(is_target_text_in_range, input_columns=["text"])
     return dataset
 
 # %% ../nbs/02_msc.ipynb 6
 normalizer = MalayalamNormalizer()
 
-# %% ../nbs/02_msc.ipynb 7
+# %% ../nbs/02_msc.ipynb 8
 def evaluate_whisper_model_msc(
     model_name: str,  # The model name
     werlist: List[float],  # WER List
@@ -95,7 +93,7 @@ def evaluate_whisper_model_msc(
     )
     clear_gpu_memory()
 
-# %% ../nbs/02_msc.ipynb 16
+# %% ../nbs/02_msc.ipynb 15
 def evaluate_faster_whisper_model_msc(
     model_name: str,  # The model name
     werlist: List[float],  # WER List
