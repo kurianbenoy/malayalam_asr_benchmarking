@@ -52,8 +52,8 @@ def store_results_as_dataset(
     model_name,
     time,
     model_size,
-    wer,
-    cer,
+    twer,
+    tcer,
     saving_name,
 ):
     df = pd.DataFrame(
@@ -74,8 +74,8 @@ def store_results_as_dataset(
 
     df["total_time"] = time
     df["model_size"] = model_size
-    df["total_wer"] = wer
-    df["total_cer"] = cer
+    df["total_wer"] = twer
+    df["total_cer"] = tcer
 
     save_name = model_name.split("/")
     save_name += saving_name
