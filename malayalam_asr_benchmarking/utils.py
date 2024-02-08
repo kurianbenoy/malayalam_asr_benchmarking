@@ -48,7 +48,7 @@ def store_results_as_dataset(
     predictions,
     predictions_raw,
     references,
-    reference_raw,
+    references_raw,
     model_name,
     time,
     model_size,
