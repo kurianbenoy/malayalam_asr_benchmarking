@@ -80,5 +80,6 @@ def store_results_as_dataset(
     df["total_cer"] = tcer
 
     save_name = model_name.split("/")
-    save_name += saving_name
-    df.to_parquet(save_name)
+
+    fname = f"{save_name[0]}_{save_name[1]}_{saving_name}"
+    df.to_parquet(fname)
