@@ -37,9 +37,19 @@ dataset](https://huggingface.co/datasets/kurianbenoy/malayalam_msc_benchmarking/
 pip install malayalam_asr_benchmarking
 ```
 
+or from github repository
+
+``` sh
+# Ensure git is installed, else install it. Eg: In ubuntu via apt install git
+pip install git+https://github.com/kurianbenoy/malayalam_asr_benchmarking.git
+```
+
 Or locally
 
 ``` sh
+# Ensure git is installed, else install it. Eg: In ubuntu via apt install git
+git clone https://github.com/kurianbenoy/malayalam_asr_benchmarking.git
+cd malayalam_asr_benchmarking
 pip install -e .
 ```
 
@@ -92,3 +102,14 @@ evaluate_whisper_model_common_voice("parambharat/whisper-tiny-ml", werlist, cerl
     Downloading (…)rocessor_config.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 185k/185k [00:02<00:00, 76.2kB/s]
 
     AssertionError: Torch not compiled with CUDA enabled
+
+``` python
+from malayalam_asr_benchmarking.commonvoice import evaluate_faster_whisper_model_common_voice
+
+werlist = []
+cerlist = []
+modelsizelist = []
+timelist = []
+
+evaluate_faster_whisper_model_common_voice("parambharat/whisper-tiny-ml", werlist, cerlist, modelsizelist, timelist)
+```
